@@ -17,8 +17,8 @@ from .QuoteScene import render_quote_scene
 FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
 SUB_FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
 
-cmd = Alconna(".q")
-command = on_alconna(cmd, aliases={"q"})
+cmd = Alconna(".qm")
+command = on_alconna(cmd, aliases={"qm"})
 
 
 @command.handle()
