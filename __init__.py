@@ -2,7 +2,7 @@ import asyncio
 import os
 from typing import Optional, List
 from pathlib import Path
-from nonebot import logger
+from nonebot import logger, require
 from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment, Bot, Message
 from nonebot_plugin_alconna import Alconna, on_alconna
 from PIL import Image, ImageDraw, ImageFont
@@ -14,8 +14,10 @@ from datetime import datetime
 import asyncio
 from .QuoteScene import render_quote_scene
 
-FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
-SUB_FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
+require("manim==0.18.1")
+
+# FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
+# SUB_FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
 
 cmd = Alconna(".qm")
 command = on_alconna(cmd, aliases={"qm"})
