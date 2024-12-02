@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "nonebot-plugin-Q-mainim-fork"
+version = "0.0.1-SNAPSHOT"
+description = "nonebot-plugin-Q-mainim-fork, quote画图， 名人名言， 用manim"
+authors = ["VincentZyu <1830540513zyu@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+#python = "^3.8"  # 指定 Python 版本
+#nonebot2 = "^2.0.0"  # 指定 NoneBot2 的版本
+#pillow = "^9.0.0"  # 添加 Pillow 库
+#opencv-python = "^4.5.3"  # 添加 OpenCV 库
+#httpx = "^0.20.0"  # 添加 httpx 库
+#numpy = "^1.21.0"  # 添加 NumPy 库
+manim = "==0.18.1"  # 添加 manim 库
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+

@@ -13,6 +13,7 @@ from io import BytesIO
 from datetime import datetime
 import asyncio
 from .QuoteScene import render_quote_scene
+from manim import *
 
 require("manim==0.18.1")
 
