@@ -1,8 +1,11 @@
 ## venv
 ```bash
 python -m venv myenv
-source ./myenv/bin/activate
 .\myenv\Scripts\activate
+
+python3 -m venv myenv
+source ./myenv/bin/activate
+
 
 pip freeze > ./requirements.txt
 

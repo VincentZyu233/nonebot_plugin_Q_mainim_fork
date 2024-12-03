@@ -10,9 +10,13 @@ def foo():
                             'media', 'images', 'qwq.png')
     print("New path =", new_path)
 
+def list_pango_fonts():
+    import manimpango
+    print("manimpango font list: ", manimpango.list_fonts())
 
 if __name__ == "__main__":
     foo()
+    list_pango_fonts()
 
 
 class FontTestScene(Scene):
