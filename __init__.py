@@ -4,7 +4,8 @@ from typing import Optional, List
 from pathlib import Path
 from nonebot import logger, require
 from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment, Bot, Message
-from nonebot_plugin_alconna import Alconna, on_alconna
+from nonebot_plugin_alconna import Alconna, on_alconna, Match, Option
+# from arclet.alconna import Args, Option
 from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
@@ -14,21 +15,36 @@ from datetime import datetime
 import asyncio
 from .QuoteScene import render_quote_scene
 from .QuoteScene_Tex import render_quote_scene_Tex
+from .QuoteScene_Tex_video import render_quote_scene_Tex_video
 from manim import *
 
-# require("manim==0.18.1")
-
-# FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
-# SUB_FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
-
-cmd = Alconna(".qm")
+# cmd = Alconna(".qm")
+# command = on_alconna(cmd, aliases={"qm"})
+cmd = Alconna(
+    ".qm",
+    Option("--image"),
+    Option("--video")
+)
 command = on_alconna(cmd, aliases={"qm"})
 
 script_path = os.path.abspath(__file__)
 print("abspath = ", script_path)
 
 @command.handle()
-async def handle_command(bot: Bot, event: MessageEvent):
+async def handle_command(
+    bot: Bot, 
+    event: MessageEvent,
+    image: Optional[Match] = cmd.find("image"),
+    video: Optional[Match] = cmd.find("video")
+):
+    
+    if image and image.matched:
+        mode_num = 1
+    elif video and video.matched:
+        mode_num = 2
+    else:
+        mode_num = 1  # 默认为 image 模式
+        
     if not event.reply:
         await command.send(MessageSegment.text("请回复一条消息以使用此命令。"))
         return
@@ -39,6 +55,7 @@ async def handle_command(bot: Bot, event: MessageEvent):
     if user_id == event.self_id:
         await command.send(MessageSegment.text("Σ( ° △ °|||)︴\n不能回复咱自己的信息"))
         return
+
 
     now_strftime = datetime.now().strftime('%Y%m%d-%H%M%S')
 
@@ -91,7 +108,7 @@ async def handle_command(bot: Bot, event: MessageEvent):
         # additional_image_path='./tmp/image/additional/additional_{}_{}.png'.format(nickname, now_strftime),
         additional_image_path= additional_image_path_with_filename,
         font_path="",
-        mode=1
+        mode=mode_num
     )
 
     result_image = await load_image(result_image_path_with_filename)
@@ -180,7 +197,11 @@ async def async_render_quote_image(
 
     def _process():
         # 这里调用你的同步渲染函数
-        flist = [render_quote_scene, render_quote_scene_Tex]
+        flist = [
+            render_quote_scene, 
+            render_quote_scene_Tex, 
+            render_quote_scene_Tex_video
+        ]
         f = flist[mode]
         res = f(
             output_filename=output_filename,

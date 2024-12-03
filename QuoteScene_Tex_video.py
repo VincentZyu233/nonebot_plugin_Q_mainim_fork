@@ -34,8 +34,8 @@ class QuoteScene(Scene):
         avatar_image_mobject = ImageMobject(self.avatar_image_path)
         avatar_image_mobject.set_height(config.frame_height)  # 设置高度
         avatar_image_mobject.to_edge(LEFT, buff=0).set_z_index(1)  # 贴靠左侧
-        self.add(avatar_image_mobject)
-        # self.play(FadeIn(avatar_image_mobject))
+        # self.add(avatar_image_mobject)
+        self.play(FadeIn(avatar_image_mobject))
 
         # 使用 PNG 图片作为纹理
         script_path = os.path.abspath(__file__)
@@ -47,8 +47,8 @@ class QuoteScene(Scene):
         mask_img.scale(2).set_z_index(2)  # 调整大小
 
         # 添加到场景中
-        self.add(mask_img)
-        # self.play(FadeIn(mask_img))
+        # self.add(mask_img)
+        self.play(FadeIn(mask_img))
 
         # self.play( Create( SurroundingRectangle(mask_img) ) )
         # self.wait(2)
@@ -84,8 +84,9 @@ class QuoteScene(Scene):
             )
             text_obj.move_to(ORIGIN).shift(RIGHT * 2.5 + UP * 3).set_z_index(3)
 
-            self.add(text_obj)
+            # self.add(text_obj)
             text_obj.shift(UP * y_offset)
+            self.play(Write(text_obj))
 
             if not text_objects:
                 pass
@@ -137,7 +138,8 @@ class QuoteScene(Scene):
             # print("qwq quote_image_and_text_group = ", quote_group)
             # quote_group.shift(DOWN * 5 / image_width * image_height )
 
-            self.add(additional_image)
+            # self.add(additional_image)
+            self.play(FadeIn(additional_image))
 
         # nickname_text = Text("——{}".format(self.nickname_text), font=self.font_path)
         nickname_text = Tex(
@@ -146,7 +148,8 @@ class QuoteScene(Scene):
             font_size=60
         )
         nickname_text.to_edge(DOWN).shift(RIGHT * 2.5).set_z_index(3)
-        self.add(nickname_text)
+        # self.add(nickname_text)
+        self.play(Write(nickname_text))
 
 
 def split_text_by_punctuation(text):
@@ -175,7 +178,7 @@ def split_text_by_punctuation(text):
 
 
 # 定义渲染函数
-def render_quote_scene_Tex(
+def render_quote_scene_Tex_video(
         output_filename: str,
         avatar_image_path: str,
         quote_text: str,
