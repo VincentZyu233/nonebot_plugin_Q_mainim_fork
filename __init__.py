@@ -13,6 +13,7 @@ from io import BytesIO
 from datetime import datetime
 import asyncio
 from .QuoteScene import render_quote_scene
+from .QuoteScene_Tex import render_quote_scene_Tex
 from manim import *
 
 # require("manim==0.18.1")
@@ -89,7 +90,8 @@ async def handle_command(bot: Bot, event: MessageEvent):
         nickname_text=nickname,
         # additional_image_path='./tmp/image/additional/additional_{}_{}.png'.format(nickname, now_strftime),
         additional_image_path= additional_image_path_with_filename,
-        font_path=""
+        font_path="",
+        mode=1
     )
 
     result_image = await load_image(result_image_path_with_filename)
@@ -171,13 +173,16 @@ async def async_render_quote_image(
         nickname_text: str,
         additional_image_path: str,
         font_path: str = "",
-        output_format: str = "png"
+        output_format: str = "png",
+        mode: int = 0,
 ) -> str:
     loop = asyncio.get_event_loop()
 
     def _process():
         # 这里调用你的同步渲染函数
-        return render_quote_scene(
+        flist = [render_quote_scene, render_quote_scene_Tex]
+        f = flist[mode]
+        res = f(
             output_filename=output_filename,
             avatar_image_path=avatar_image_path,
             quote_text=quote_text,
@@ -186,6 +191,16 @@ async def async_render_quote_image(
             font_path=font_path,
             output_format=output_format
         )
+        return res
+        # return render_quote_scene(
+        #     output_filename=output_filename,
+        #     avatar_image_path=avatar_image_path,
+        #     quote_text=quote_text,
+        #     nickname_text=nickname_text,
+        #     additional_image_path=additional_image_path,
+        #     font_path=font_path,
+        #     output_format=output_format
+        # )
         # 返回生成的文件路径（假设渲染后文件保存在当前目录下）
         # return "./tmp/result/result_{}_{}".format(nickname_text, now_strftime)
 

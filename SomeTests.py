@@ -10,12 +10,38 @@ def foo():
                             'media', 'images', 'qwq.png')
     print("New path =", new_path)
 
+    
+
+def list_fonts():
+    import matplotlib.font_manager as font_manager
+    # 获取系统中的所有字体
+    fonts = font_manager.findSystemFonts()
+    
+    # 用于存储字体名称的集合
+    font_names = set()
+    
+    # 遍历所有字体文件并提取字体名称
+    for font in fonts:
+        try:
+            # 使用 font_manager 的 FontProperties 来获取字体名称
+            font_properties = font_manager.FontProperties(fname=font)
+            font_name = font_properties.get_name()
+            font_names.add(font_name)
+        except Exception as e:
+            print(f"Error processing {font}: {e}")
+    
+    # 打印所有字体名称
+    for font_name in sorted(font_names):
+        print(font_name)
+
+
 def list_pango_fonts():
     import manimpango
     print("manimpango font list: ", manimpango.list_fonts())
 
 if __name__ == "__main__":
-    foo()
+    list_fonts()
+    # foo()
     list_pango_fonts()
 
 
@@ -88,6 +114,26 @@ class LocalFontTestScene(Scene):
             # 显示字体文件名
             fname = Text(font_name).move_to([0, 3 - i, 0], aligned_edge=RIGHT)
             self.add(fname)
+
+class LocalFontTestScene2(Scene):
+    """
+        manim -pql SomeTests.py LocalFontTestScene2
+        manim -pqh SomeTests.py LocalFontTestScene2
+    """
+    def construct(self):
+
+        MyTexTemplate = TexTemplate(
+            tex_compiler="xelatex",
+            output_format='.xdv',
+        )
+        MyTexTemplate.add_to_preamble(r"\usepackage{fontspec}\setmainfont{Source Han Serif SC}")
+
+        tex = Tex(
+            "你好你好你好你好你好",
+            tex_template=MyTexTemplate,
+            color = BLUE,
+        ).scale(2.5)
+        self.add(tex)
 
 
 class TestClass(Scene):

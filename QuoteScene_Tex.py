@@ -6,13 +6,15 @@ from datetime import datetime  # 导入 datetime 模块
 
 
 class QuoteScene(Scene):
-    def __init__(self,
-                 avatar_image_path: str,
-                 quote_text: str,
-                 nickname_text: str,
-                 additional_image_path: str,
-                 font_path: str,
-                 *args, **kwargs):
+    def __init__(
+            self,
+            avatar_image_path: str,
+            quote_text: str,
+            nickname_text: str,
+            additional_image_path: str,
+            font_path: str,
+            *args, **kwargs
+        ):
         self.avatar_image_path = avatar_image_path
         self.quote_text = quote_text
         self.nickname_text = nickname_text
@@ -21,19 +23,12 @@ class QuoteScene(Scene):
         super().__init__(*args, **kwargs)
 
     def construct(self):
-        # 加载图片并调整为 1:1 比例
-        # img = Image.open(self.avatar_image_path)
-        # img_width, img_height = img.size
-        # min_dim = min(img_width, img_height)
-        # left = (img_width - min_dim) // 2
-        # top = (img_height - min_dim) // 2
-        # right = left + min_dim
-        # bottom = top + min_dim
-        # img = img.crop((left, top, right, bottom))  # 裁剪为正方形
-        # img_array = np.array(img)
+        MyTexTemplate = TexTemplate(
+            tex_compiler="xelatex",
+            output_format='.xdv',
+        )
+        MyTexTemplate.add_to_preamble(r"\usepackage{fontspec}\setmainfont{Source Han Serif SC}")
 
-        # 创建 ImageMobject
-        # avatar_image_mobject = ImageMobject(img_array)
         avatar_image_mobject = ImageMobject(self.avatar_image_path)
         avatar_image_mobject.set_height(config.frame_height)  # 设置高度
         avatar_image_mobject.to_edge(LEFT, buff=0).set_z_index(1)  # 贴靠左侧
@@ -76,10 +71,15 @@ class QuoteScene(Scene):
             print("self.font_path = ", self.font_path)
             # with register_font(self.font_path):
             # a = Text("Hello", font="Custom Font Name")
-            text_obj = Text(segment,
-                            # font=self.font_path,
-                            font="sans-serif",
-                            font_size=36)
+            # text_obj = Text(segment,
+            #                 # font=self.font_path,
+            #                 font="sans-serif",
+            #                 font_size=36)
+            text_obj = Tex(
+                segment,
+                tex_template=MyTexTemplate,
+                font_size=32
+            )
             text_obj.move_to(ORIGIN).shift(RIGHT * 2.5 + UP * 3).set_z_index(3)
 
             self.add(text_obj)
@@ -168,7 +168,7 @@ def split_text_by_punctuation(text):
 
 
 # 定义渲染函数
-def render_quote_scene(
+def render_quote_scene_Tex(
         output_filename: str,
         avatar_image_path: str,
         quote_text: str,
