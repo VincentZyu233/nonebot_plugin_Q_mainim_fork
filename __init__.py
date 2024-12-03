@@ -15,7 +15,7 @@ import asyncio
 from .QuoteScene import render_quote_scene
 from manim import *
 
-require("manim==0.18.1")
+# require("manim==0.18.1")
 
 # FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
 # SUB_FONT_PATH = Path("YaHei Consolas Hybrid 1.12.ttf")
@@ -23,6 +23,8 @@ require("manim==0.18.1")
 cmd = Alconna(".qm")
 command = on_alconna(cmd, aliases={"qm"})
 
+script_path = os.path.abspath(__file__)
+print("abspath = ", script_path)
 
 @command.handle()
 async def handle_command(bot: Bot, event: MessageEvent):
@@ -41,9 +43,14 @@ async def handle_command(bot: Bot, event: MessageEvent):
 
     avatar_url = f"https://q1.qlogo.cn/g?b=qq&nk={user_id}&s=640"
     avatar_image = await fetch_image_from_url(avatar_url)
+    avatar_image_save_dir_path = os.path.join(
+        os.path.dirname(script_path),
+        'tmp', 'image', 'avatar'
+    )
     await save_image(
         image=avatar_image,
-        save_path='./tmp/image/avatar/',
+        # save_path='./tmp/image/avatar/',
+        save_path=avatar_image_save_dir_path,
         file_name='avatar_{}_{}.png'.format(nickname, now_strftime)
     )
 
@@ -51,27 +58,41 @@ async def handle_command(bot: Bot, event: MessageEvent):
         await command.send(MessageSegment.text("无法获取用户头像，请检查网络连接。"))
         return
     additional_image = None
+    additional_image_save_dir_path = ""
     image_segment = next((seg for seg in event.reply.message if seg.type == "image"), None)
     if image_segment:
         image_url = image_segment.data['url']
         additional_image = await fetch_image_from_url(image_url)
+        additional_image_save_dir_path = os.path.join(
+            os.path.dirname(script_path),
+            'tmp', 'image', 'additional'
+        )
         await save_image(
             image=additional_image,
-            save_path='./tmp/image/additional/',
+            # save_path='./tmp/image/additional/',
+            save_path=additional_image_save_dir_path,
             file_name='additional_{}_{}.png'.format(nickname, now_strftime)
         )
+    
+    avatar_image_path_with_filename = avatar_image_save_dir_path+'/avatar_{}_{}.png'.format(nickname, now_strftime)
+    
+    additional_image_path_with_filename = ""
+    if additional_image_save_dir_path != "":
+        additional_image_path_with_filename = additional_image_save_dir_path+'/additional_{}_{}.png'.format(nickname, now_strftime)
 
     # result_image = await process_image(avatar_image_path, reply_content, nickname, additional_image)
-    result_image_path = await async_render_quote_image(
+    result_image_path_with_filename = await async_render_quote_image(
         output_filename="result_{}_{}.png".format(nickname, now_strftime),
-        avatar_image_path='./tmp/image/avatar/avatar_{}_{}.png'.format(nickname, now_strftime),
+        # avatar_image_path='./tmp/image/avatar/avatar_{}_{}.png'.format(nickname, now_strftime),
+        avatar_image_path=avatar_image_path_with_filename,
         quote_text=reply_content,
         nickname_text=nickname,
-        additional_image_path='./tmp/image/additional/additional_{}_{}.png'.format(nickname, now_strftime),
+        # additional_image_path='./tmp/image/additional/additional_{}_{}.png'.format(nickname, now_strftime),
+        additional_image_path= additional_image_path_with_filename,
         font_path=""
     )
 
-    result_image = await load_image(result_image_path)
+    result_image = await load_image(result_image_path_with_filename)
 
     if result_image is not None:
         image_bytes = BytesIO()
@@ -80,6 +101,10 @@ async def handle_command(bot: Bot, event: MessageEvent):
         await command.send(MessageSegment.image(image_bytes))
     else:
         await command.send(MessageSegment.text("处理图片时发生错误，请检查输入参数。"))
+        
+    delete_image(avatar_image_path_with_filename)
+    delete_image(additional_image_path_with_filename)
+    delete_image(result_image_path_with_filename)
 
 
 def extract_reply_content(reply_msg: Message) -> str:
@@ -191,3 +216,18 @@ async def load_image(image_path: str) -> Image.Image:
             return None
 
     return await loop.run_in_executor(None, _process)
+
+def delete_image(image_path: str) -> None:
+    """
+    删除指定路径的图片文件。
+
+    :param image_path: 图片文件的绝对路径。
+    """
+    try:
+        if os.path.exists(image_path):
+            os.remove(image_path)
+            print(f"Image deleted: {image_path}")
+        else:
+            print(f"Image not found: {image_path}")
+    except Exception as e:
+        print(f"Failed to delete image: {image_path}. Error: {e}")

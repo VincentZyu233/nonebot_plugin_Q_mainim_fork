@@ -41,7 +41,11 @@ class QuoteScene(Scene):
         # self.play(FadeIn(avatar_image_mobject))
 
         # 使用 PNG 图片作为纹理
-        mask_img = ImageMobject("static/resource/images/mask.png")  # 自行准备 PNG 图像
+        script_path = os.path.abspath(__file__)
+        mask_path = os.path.join(os.path.dirname(script_path),
+                            'static', 'resource', 'images', 'mask.png' )
+        # mask_img = ImageMobject("static/resource/images/mask.png")  # 自行准备 PNG 图像
+        mask_img = ImageMobject(mask_path)  # 自行准备 PNG 图像
         mask_img.set_resampling_algorithm(RESAMPLING_ALGORITHMS["linear"])  # 平滑处理
         mask_img.scale(2).set_z_index(2)  # 调整大小
 
@@ -66,6 +70,7 @@ class QuoteScene(Scene):
         # 创建每一行的 Text 对象
         y_offset = 0
         text_objects = []
+        text_objects.append(Text(""))
 
         for segment in segments:
             print("self.font_path = ", self.font_path)
@@ -108,23 +113,32 @@ class QuoteScene(Scene):
         #
         # self.wait(1)
 
+        # 如果没有就传空串
         if self.additional_image_path != "":
             additional_image = ImageMobject(self.additional_image_path)
-            image_width = additional_image.width
-            image_height = additional_image.height
-            quote_text_width = text_objects[0].width
 
-            additional_image.scale(quote_text_width / image_width * 0.8)
-            additional_image.next_to(text_objects[0], UP).set_z_index(3)
+            # additional_image.scale(quote_text_width / image_width * 0.8)
+            additional_image.set_width(3)
+            # additional_image.next_to(text_objects[0], UP).set_z_index(3)
+            additional_image.to_edge(UP).to_edge(RIGHT)
+            additional_image.shift(LEFT*0.8+DOWN*0.6)
+            additional_image.set_z_index(3)
+            
+            quote_text_group = VGroup(*text_objects)
+            quote_text_group.next_to(additional_image, DOWN)
+            quote_text_group.align_to(additional_image, LEFT)
 
-            quote_group = Group(additional_image, *text_objects)
-            print("qwq quote_image_and_text_group = ", quote_group)
-            quote_group.shift(DOWN * image_height * 1.44)
+            # image_width = additional_image.width
+            # image_height = additional_image.height
+            
+            # quote_group = Group(additional_image, *text_objects)
+            # print("qwq quote_image_and_text_group = ", quote_group)
+            # quote_group.shift(DOWN * 5 / image_width * image_height )
 
             self.add(additional_image)
 
         nickname_text = Text("——{}".format(self.nickname_text), font=self.font_path)
-        nickname_text.to_edge(DOWN).shift(RIGHT * 2).set_z_index(3)
+        nickname_text.to_edge(DOWN).shift(RIGHT * 2.5).set_z_index(3)
         self.add(nickname_text)
 
 

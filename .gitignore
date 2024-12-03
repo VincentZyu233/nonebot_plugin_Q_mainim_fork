@@ -5,3 +5,5 @@ myenv*/
 media/
 
 static/resource/fonts/
+
+tmp/
